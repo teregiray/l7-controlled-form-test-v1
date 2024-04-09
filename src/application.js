@@ -20,7 +20,7 @@ const myFunction = () => {
   const inputName = document.querySelector('input[id="inputName"]');
   const inputEmail = document.querySelector('input[id="inputEmail"]');
 
-  const isValidName = (name) => /^[a-zA-Z]+(\s+[a-zA-Z]+)*$/.test(name);
+  const isValidName = (name) => /^[a-zA-Z]+$/.test(name);
   const isValidEmail = (email) => /^[\w\d.]+@[\w\d.]+$/.test(email);
 
   const addClass = (input) => {
