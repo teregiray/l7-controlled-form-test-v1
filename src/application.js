@@ -68,7 +68,6 @@ const myFunction = () => {
       email: formData.get('email'),
     })
       .then((res) => {
-        console.log(res);
         document.body.innerHTML = `<p>${res.data.message}</p>.`;
       }).catch((error) => {
         console.error(error);
