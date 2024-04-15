@@ -1,27 +1,28 @@
 import axios from 'axios';
 
 const myFunction = () => {
+  const validateName = (name) => /^[a-zA-Z]+$/.test(name);
+  const validatePhone = (phone) => /^([+]?[0-9\s-]{3,10})*$/i.test(phone);
+
+  const state = {
+    validateName: false,
+    validatePhone: false,
+  };
   const mainDiv = document.querySelector('.form-container');
-  const form = document.createElement('form');
-  form.innerHTML = `<form id="registrationForm">
+  mainDiv.innerHTML = `<form id="registrationForm">
     <div class="form-group">
         <label for="inputName">Name</label>
-        <input type="text" class="form-control" id="inputName" placeholder="Введите ваше имя" name="name" required>
+        <input type="text" class="form-control" id="inputName" placeholder="Input name" name="name" required>
     </div>
     <div class="form-group">
-        <label for="inputEmail">Email</label>
-        <input type="text" class="form-control" id="inputEmail" placeholder="Введите email" name="email" required>
+        <label for="inputPhone">Phone</label>
+        <input type="text" class="form-control" id="inputPhone" placeholder="Input phone" name="phone" required>
     </div>
     <input type="submit" value="Submit" class="btn btn-primary">
 </form>`;
-  mainDiv.appendChild(form);
 
-  const submitButton = document.querySelector('input[type="submit"]');
-  const inputName = document.querySelector('input[id="inputName"]');
-  const inputEmail = document.querySelector('input[id="inputEmail"]');
-
-  const isValidName = (name) => /^[a-zA-Z]+$/.test(name);
-  const isValidEmail = (email) => /^[\w\d.]+@[\w\d.]+$/.test(email);
+  const form = document.querySelector('form');
+  const submit = document.querySelector('.btn');
 
   const addClass = (input) => {
     input.classList.remove('is-invalid');
@@ -32,46 +33,49 @@ const myFunction = () => {
     input.classList.add('is-invalid');
   };
 
-  const validateInputs = () => {
-    const name = inputName.value.trim();
-    const email = inputEmail.value.trim();
-    const nameIsValid = isValidName(name);
-    const emailIsValid = isValidEmail(email);
+  const inputName = document.querySelector('#inputName');
+  const inputPhone = document.querySelector('#inputPhone');
 
-    if (nameIsValid) {
+  inputName.addEventListener('input', (e) => {
+    const name = e.target.value.trim();
+    if (validateName(name)) {
+      state.validateName = true;
       addClass(inputName);
     } else {
+      state.validateName = false;
       removeClass(inputName);
     }
-
-    if (emailIsValid) {
-      addClass(inputEmail);
+    if (state.validatePhone && state.validateName) {
+      submit.disabled = false;
     } else {
-      removeClass(inputEmail);
+      submit.disabled = true;
     }
+  });
 
-    if (nameIsValid && emailIsValid) {
-      submitButton.disabled = false;
+  inputPhone.addEventListener('input', (e) => {
+    const email = e.target.value.trim();
+
+    if (validatePhone(email)) {
+      state.validatePhone = true;
+      inputPhone.classList.add('is-valid');
+      inputPhone.classList.remove('is-invalid');
     } else {
-      submitButton.disabled = true;
+      state.validatePhone = false;
+      inputPhone.classList.remove('is-valid');
+      inputPhone.classList.add('is-invalid');
     }
-  };
-
-  inputName.addEventListener('input', validateInputs);
-  inputEmail.addEventListener('input', validateInputs);
+    if (state.validatePhone && state.validateName) {
+      submit.disabled = false;
+    } else {
+      submit.disabled = true;
+    }
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const formData = new FormData(form);
-    axios.post('/users', {
-      name: formData.get('name'),
-      email: formData.get('email'),
-    })
-      .then((res) => {
-        document.body.innerHTML = `<p>${res.data.message}</p>.`;
-      }).catch((error) => {
-        console.error(error);
-      });
+    await axios.post('/people', { name: '', email: '' });
+    document.body.innerHTML = '<h3 class="mb-4">User successfully registered</h3>';
   });
 };
+
 export default myFunction;
